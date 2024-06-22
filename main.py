@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -28,12 +29,16 @@ param_grid = {
 # Inicializar el modelo base
 rf = RandomForestRegressor(random_state=42)
 
+# Handle missing values using imputation
+imputer = SimpleImputer(strategy='mean')  # Replace missing values with the mean
+X_train_imputed = imputer.fit_transform(X_train)
+
 # Realizar búsqueda aleatoria de hiperparámetros
 random_search = RandomizedSearchCV(estimator=rf, param_distributions=param_grid, 
                                    n_iter=100, cv=3, verbose=2, random_state=42, n_jobs=-1)
 
 # Ajustar el modelo
-random_search.fit(X_train, y_train)
+random_search.fit(X_train_imputed, y_train)
 
 # Obtener el mejor modelo
 best_rf = random_search.best_estimator_
